@@ -27,9 +27,9 @@ pub async fn get_arb_sepolia_client() -> Provider<Http> {
     Provider::<Http>::try_from(rpc_url).unwrap()
 }
 
-pub async fn get_base_goerli_client() -> Provider<Http> {
+pub async fn get_base_sepolia_client() -> Provider<Http> {
     dotenv().ok();
-    let goerli_url: String = env::var("BASEGOERLI_URL").expect("BASEGOERLI_URL must be set");
+    let goerli_url: String = env::var("BASESEPOLIA_URL").expect("BASESEPOLIA_URL must be set");
     let rpc_url: &str = &goerli_url.as_str();
 
     Provider::<Http>::try_from(rpc_url).unwrap()
@@ -43,9 +43,9 @@ pub async fn get_zksync_goerli_client() -> Provider<Http> {
     Provider::<Http>::try_from(rpc_url).unwrap()
 }
 
-pub async fn get_zkevm_goerli_client() -> Provider<Http> {
+pub async fn get_zkevm_sepolia_client() -> Provider<Http> {
     dotenv().ok();
-    let goerli_url: String = env::var("ZKEVM_URL").expect("ZKEVM_URL must be set");
+    let goerli_url: String = env::var("ZKEVM_SEPOLIA_URL").expect("ZKEVM_SEPOLIA_URL must be set");
     let rpc_url: &str = &goerli_url.as_str();
 
     Provider::<Http>::try_from(rpc_url).unwrap()
