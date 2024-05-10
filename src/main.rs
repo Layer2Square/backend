@@ -1,13 +1,13 @@
-use std::sync::Arc;
-type Client = SignerMiddleware<Provider<Http>, Wallet<k256::ecdsa::SigningKey>>;
-use ethers::{abi::Address, prelude::*, providers::Provider};
+use ethers::prelude::*;
 
 mod client;
 mod call_function;
 mod wallet;
 
 mod abi;
-use abi::{ONFT1155NFT, ONFT721NFT};
+use abi::ONFT721NFT;
+
+type Client = SignerMiddleware<Provider<Http>, Wallet<k256::ecdsa::SigningKey>>;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -20,14 +20,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let caller = wallet::get_wallet(Chain::ArbitrumSepolia);
     // println!("Caller Address: {caller.address()}");
     let client: Client = SignerMiddleware::new(arb_provider.clone(), caller.clone());
-    call_function::erc_721_mint(client.clone(), U256::from(32)).await;
-
-    // // test the name function
-    // let name = arb_721_nft.name().call().await?;
-    // println!("NFT name: {name}");
-
-    // let tx = arb_721_nft.mint(caller.address(), U256::from(11)).send().await?.await?;
-    // println!("Minted NFT with tx hash: {}", serde_json::to_string(&tx)?);
+    // call_function::erc_721_mint(client.clone(), U256::from(32)).await;
+    let _ = call_function::erc_721_cross_chain_send(client.clone(), U256::from(11)).await;
 
     Ok(())
 }

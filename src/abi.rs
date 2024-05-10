@@ -16,7 +16,7 @@ abigen!(
     function ownerOf(uint256 tokenId) public view returns (address)
     function balanceOf(address owner) public view returns (uint256)
     function tokenURI(uint256 tokenId) public view returns (string memory)
-    function estimateFees(uint16 _dstChainId, address _userApplication, bytes memory _payload, bool _payInZRO, bytes memory _adapterParams) public view override returns (uint nativeFee, uint zroFee)
+    function estimateSendFee(uint16 _dstChainId, bytes calldata _toAddress, uint _tokenId, bool _useZro, bytes calldata _adapterParams ) external view returns (uint nativeFee, uint zroFee)
     function sendFrom(address _from, uint16 _dstChainId, bytes calldata _toAddress, uint _tokenId, address payable _refundAddress, address _zroPaymentAddress, bytes calldata _adapterParams) external payable
   ]"#,
 );
