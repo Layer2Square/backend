@@ -20,8 +20,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let caller = wallet::get_wallet(Chain::ArbitrumSepolia);
     // println!("Caller Address: {caller.address()}");
     let client: Client = SignerMiddleware::new(arb_provider.clone(), caller.clone());
-    // call_function::erc_721_mint(client.clone(), U256::from(32)).await;
-    let _ = call_function::erc_721_cross_chain_send(client.clone(), U256::from(11)).await;
+    // let _ = call_function::erc_721_mint(client.clone(), U256::from(32)).await;
+    // let _ = call_function::erc_721_cross_chain_send(client.clone(), U256::from(11)).await;
+    // let _ = call_function::erc_721_list(client.clone(), U256::from(11), U256::from(100)).await;
+    let _ = call_function::erc_1155_mint(client.clone(), U256::from(0), U256::from(1));
 
     Ok(())
 }
