@@ -7,7 +7,10 @@ edition = "2021"
 
 [dependencies]
 dotenv = "0.15.0"
-ethers = { version = "2.0", features = ["optimism"] }
+# ethers = { version = "2.0", features = ["optimism"] }
+# ethers = "2.0.14"
+# 官方的库里最新版本没有 Polygon ZkEVM Cardano 测试网，因此自己 fork
+ethers = { git = "https://github.com/kongtaoxing/ethers-rs"}
 eyre = "0.6"
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }

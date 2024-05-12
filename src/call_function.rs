@@ -8,7 +8,7 @@ use crate::{abi::NFTMatket, ONFT721NFT, abi::ONFT1155NFT};
 type Client = SignerMiddleware<Provider<Http>, Wallet<k256::ecdsa::SigningKey>>;
 
 #[allow(dead_code)]
-pub async fn erc_721_mint(client: Client, token_id: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_721_mint(client: Client, token_id: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC721_CA")
     .expect("ERC721 NFT Contract Address must be set")
@@ -16,12 +16,17 @@ pub async fn erc_721_mint(client: Client, token_id: U256) -> Result<(), Box<dyn 
     .unwrap();
   let contract = ONFT721NFT::new(nft_contract_address.clone(), Arc::new(client.clone()));
   let tx = contract.mint(client.address(), token_id).send().await?.await?;
-  println!("Minted NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  // println!("Minted NFT with tx hash: {}", serde_json::to_string(&tx)?);
+  // let hash = tx.clone().unwrap().transaction_hash;
+  let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  let ether_used = gas_used * gas_price;
+  // println!("{:?} {:?}", hash, ether_used);
+  Ok(ether_used)
 }
 
 #[allow(dead_code)]
-pub async fn erc_721_cross_chain_send(client: Client, token_id: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_721_cross_chain_send(client: Client, token_id: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC721_CA")
     .expect("ERC721 NFT Contract Address must be set")
@@ -30,27 +35,30 @@ pub async fn erc_721_cross_chain_send(client: Client, token_id: U256) -> Result<
   let contract = ONFT721NFT::new(nft_contract_address.clone(), Arc::new(client.clone()));
   // get estimated fees
   let fees = contract.estimate_send_fee(
-    10232, 
+    10161, 
     Bytes::from(client.address().to_fixed_bytes()), 
     token_id, 
     false, 
     Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
   ).call()
   .await?;
-  println!("fee: {}", serde_json::to_string(&fees.0)?);
-  let tx = contract.send_from(
-    client.address(), 
-    10232, 
-    Bytes::from(client.address().to_fixed_bytes()), 
-    token_id, 
-    client.address(), 
-    Address::zero(), 
-    Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
-  )
-  .value(fees.0)
-  .send().await.unwrap().await.unwrap();
-  println!("Sent NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  // println!("fee: {}", serde_json::to_string(&fees.0)?);
+  // let tx = contract.send_from(
+  //   client.address(), 
+  //   10232, 
+  //   Bytes::from(client.address().to_fixed_bytes()), 
+  //   token_id, 
+  //   client.address(), 
+  //   Address::zero(), 
+  //   Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
+  // )
+  // .value(fees.0)
+  // .send().await?.await?;
+  // // println!("Sent NFT with tx hash: {}", serde_json::to_string(&tx)?);
+  // let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  // let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  // let ether_used = gas_used * gas_price;
+  Ok(fees.0)
 }
 
 #[allow(dead_code)]
@@ -67,7 +75,7 @@ pub async fn erc_721_set_approval_for_all(client: Client, operator: Address, app
 }
 
 #[allow(dead_code)]
-pub async fn erc_721_list(client: Client, token_id: U256, price: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_721_list(client: Client, token_id: U256, price: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC721_CA")
     .expect("ERC721 NFT Contract Address must be set")
@@ -86,12 +94,14 @@ pub async fn erc_721_list(client: Client, token_id: U256, price: U256) -> Result
     println!("Set Approval For All with tx hash: {}", serde_json::to_string(&tx)?);
   }
   let tx = contract.list_nft(nft_contract_address, token_id, price).send().await?.await?;
-  println!("Listed NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  let ether_used = gas_used * gas_price;
+  Ok(ether_used)
 }
 
 #[allow(dead_code)]
-pub async fn erc_1155_mint(client: Client, token_id: U256, amount: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_1155_mint(client: Client, token_id: U256, amount: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC1155_CA")
     .expect("ERC1155 NFT Contract Address must be set")
@@ -99,12 +109,15 @@ pub async fn erc_1155_mint(client: Client, token_id: U256, amount: U256) -> Resu
     .unwrap();
   let contract = ONFT1155NFT::new(nft_contract_address.clone(), Arc::new(client.clone()));
   let tx = contract.mint(client.address(), token_id, amount).send().await?.await?;
-  println!("Minted NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  // println!("Minted NFT with tx hash: {}", serde_json::to_string(&tx)?);
+  let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  let ether_used = gas_used * gas_price;
+  Ok(ether_used)
 }
 
 #[allow(dead_code)]
-pub async fn erc_1155_cross_chain_send(client: Client, token_id: U256, amount: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_1155_cross_chain_send(client: Client, token_id: U256, amount: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC1155_CA")
     .expect("ERC1155 NFT Contract Address must be set")
@@ -113,7 +126,7 @@ pub async fn erc_1155_cross_chain_send(client: Client, token_id: U256, amount: U
   let contract = ONFT1155NFT::new(nft_contract_address.clone(), Arc::new(client.clone()));
   // get estimated fees
   let fees = contract.estimate_send_fee(
-    10232, 
+    10161, 
     Bytes::from(client.address().to_fixed_bytes()), 
     token_id, 
     amount, 
@@ -121,20 +134,23 @@ pub async fn erc_1155_cross_chain_send(client: Client, token_id: U256, amount: U
     Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
   ).call()
   .await?;
-  println!("fee: {}", serde_json::to_string(&fees.0)?);
-  let tx = contract.send_from(
-    client.address(), 
-    10232, 
-    Bytes::from(client.address().to_fixed_bytes()), 
-    token_id, 
-    client.address(), 
-    Address::zero(), 
-    Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
-  )
-  .value(fees.0)
-  .send().await.unwrap().await.unwrap();
-  println!("Sent NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  // println!("fee: {}", serde_json::to_string(&fees.0)?);
+  // let tx = contract.send_from(
+  //   client.address(), 
+  //   10161, 
+  //   Bytes::from(client.address().to_fixed_bytes()), 
+  //   token_id, 
+  //   client.address(), 
+  //   Address::zero(), 
+  //   Bytes::from(hex::decode("00010000000000000000000000000000000000000000000000000000000000030d40").unwrap())
+  // )
+  // .value(fees.0)
+  // .send().await.unwrap().await.unwrap();
+  // // println!("Sent NFT with tx hash: {}", serde_json::to_string(&tx)?);
+  // let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  // let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  // let ether_used = gas_used * gas_price;
+  Ok(fees.0)
 }
 
 #[allow(dead_code)]
@@ -151,7 +167,7 @@ pub async fn erc_1155_set_approval_for_all(client: Client, operator: Address, ap
 }
 
 #[allow(dead_code)]
-pub async fn erc_1155_list(client: Client, token_id: U256, amount: U256, price: U256) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn erc_1155_list(client: Client, token_id: U256, amount: U256, price: U256) -> Result<U256, Box<dyn std::error::Error>> {
   dotenv().ok();
   let nft_contract_address = env::var("ERC1155_CA")
     .expect("ERC1155 NFT Contract Address must be set")
@@ -170,6 +186,9 @@ pub async fn erc_1155_list(client: Client, token_id: U256, amount: U256, price: 
     println!("Set Approval For All with tx hash: {}", serde_json::to_string(&tx)?);
   }
   let tx = contract.list_1155nft(nft_contract_address, token_id, amount, price).send().await?.await?;
-  println!("Listed NFT with tx hash: {}", serde_json::to_string(&tx)?);
-  Ok(())
+  // println!("Listed NFT with tx hash: {}", serde_json::to_string(&tx)?);
+  let gas_used = tx.clone().unwrap().gas_used.unwrap();
+  let gas_price = tx.clone().unwrap().effective_gas_price.unwrap();
+  let ether_used = gas_used * gas_price;
+  Ok(ether_used)
 }
